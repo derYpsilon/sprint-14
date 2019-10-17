@@ -17,9 +17,16 @@ module.exports.getAllCards = (req, res) => {
 }
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send(card !== null ? { data: card } : { data: 'Nothing to delete' }))
-    .catch(() => res.status(500).send({ message: 'Server Controller Error while deleting Card' }))
+  Card.findById(req.params.id)
+    // eslint-disable-next-line consistent-return
+    .then((card) => {
+      if (!card) return Promise.reject(new Error('Такой карты нет'))
+      if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) return Promise.reject(new Error('Карта не ваша! Удалить нельзя!'))
+      Card.remove(card)
+        .then((cardToDelete) => res.send(cardToDelete !== null ? { data: card } : { data: 'Nothing to delete' }))
+        .catch((err) => res.status(500).send({ message: err.message }))
+    })
+    .catch((err) => res.status(500).send({ message: err.message }))
 }
 
 module.exports.likeCard = (req, res) => {
