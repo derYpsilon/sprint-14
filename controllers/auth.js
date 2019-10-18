@@ -2,11 +2,12 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
+// eslint-disable-next-line consistent-return
 module.exports.createUser = (req, res) => {
+  if (Object.keys(req.body).length === 0) return res.status(400).send({ message: 'Тело запроса пустое' })
   const {
     name, about, avatar, email, password,
   } = req.body
-
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -14,7 +15,7 @@ module.exports.createUser = (req, res) => {
       .then((user) => res.status(201).send({
         _id: user._id, name: user.name, about: user.about, email: user.email,
       }))
-      .catch((err) => res.status(400).send({ message: `Server Controller Error while creating User -- ${err}` })))
+      .catch((err) => res.status(400).send({ message: `Error while creating User -- ${err}` })))
 }
 
 module.exports.login = (req, res) => {

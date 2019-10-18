@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const helmet = require('helmet')
 const usersRoute = require('./routes/users')
 const cardsRoute = require('./routes/cards')
 const auth = require('./middlewares/auth')
@@ -9,6 +10,8 @@ const { createUser, login } = require('./controllers/auth')
 const { PORT = 3000 } = process.env
 
 const app = express()
+
+app.use(helmet)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
