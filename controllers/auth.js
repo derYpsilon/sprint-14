@@ -28,7 +28,13 @@ module.exports.login = (req, res) => {
         process.env.SECRET_KEY,
         { expiresIn: '7d' },
       )
-      res.send(token)
+      res
+        .status(201)
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        }).send({ message: 'Logged successfully' })
     })
     .catch((err) => {
       res
